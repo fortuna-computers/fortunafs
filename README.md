@@ -16,12 +16,14 @@ A special **@boot** key allows writing or reading the boot area.
 
 The image is divided in 512-byte sectors. The sections are the following:
 
-| Section | Size, in sectors | Size, in MB |
-|---------|------------------|-------------|
-| Config  | 1                | < 1         |
-| Boot    | 8191             | 4 MB        |
-| Hash    | 131.072          | 64 MB       |
-
+| Section                  | Size, in sectors       | Size, in MB |
+|--------------------------|------------------------|-------------|
+| Config                   | 1                      | < 1         |
+| Boot                     | 8191                   | 4 MB        |
+| Hash                     | 131.072                | 64 MB       |
+| Metadata                 | used-defined           | *           |
+| Cluster allocation table | content-size dependent | *           |
+| Content                  | rest of volume         | *           |
 
 ### Config area: 1 sector
 
