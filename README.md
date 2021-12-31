@@ -16,14 +16,14 @@ A special **@boot** key allows writing or reading the boot area.
 
 The image is divided in 512-byte sectors. The sections are the following:
 
-| Section                  | Size, in sectors       | Size, in MB |
-|--------------------------|------------------------|-------------|
-| Config                   | 1                      | < 1         |
-| Boot                     | 8191                   | 4 MB        |
-| Hash                     | 131.072                | 64 MB       |
-| Metadata                 | used-defined`*`        | *           |
-| Cluster allocation table | content-size dependent | *           |
-| Content                  | rest of volume         | *           |
+| Section                  | Size, in sectors         | Size, in MB |
+|--------------------------|--------------------------|-------------|
+| Config                   | 1                        | < 1         |
+| Boot                     | 8191                     | 4 MB        |
+| Hash                     | 131.072                  | 64 MB       |
+| Metadata                 | used-defined`*`          | *           |
+| Cluster allocation table | 1/64 of the content area |  *          |
+| Content                  | rest of volume           | *           |
 `*` values  of around 128MB ~ 256MB are recommended
 
 ### Config area: 1 sector
@@ -88,7 +88,9 @@ In this case, it is necessary to compare the key string.
 
 If the record is a **deleted record**, the record is deleted and can be reused.
 
-### Cluster allocation table: size dependent on content area
+The number of records available are 32.768 records per MB of metadata area.
+
+### Cluster allocation table: 1/64 of the content area
 
 The CAT contains an array of 64-bit values, which contains linked-lists of indexes to the content area.
 This shows where a value continues after the end of each section.
