@@ -22,7 +22,7 @@ The image is divided in 512-byte sectors. The sections are the following:
 | Boot                     | 8191                     | 4 MB        |
 | Hash                     | 131.072                  | 64 MB       |
 | Metadata                 | used-defined`*`          | *           |
-| Cluster allocation table | 1/64 of the content area |  *          |
+| Cluster allocation table | 1/64 of the content area | *           |
 | Content                  | rest of volume           | *           |
 `*` values  of around 128MB ~ 256MB are recommended
 
@@ -76,7 +76,7 @@ If the record is a **metadata record**, the rest of the record contains the foll
 
 | Offset | Data size | Description                  |
 |--------|-----------|------------------------------|
- | 0x1    | 1         | Reserved                     |
+| 0x1    | 1         | Reserved                     |
 | 0x2    | 8         | Sector index in content area |
 | 0xA    | 8         | Value size                   |
 | 0x12   | 14`*`     | Key name (ends with `NULL`)  |
