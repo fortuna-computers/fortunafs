@@ -21,9 +21,10 @@ The image is divided in 512-byte sectors. The sections are the following:
 | Config                   | 1                      | < 1         |
 | Boot                     | 8191                   | 4 MB        |
 | Hash                     | 131.072                | 64 MB       |
-| Metadata                 | used-defined           | *           |
+| Metadata                 | used-defined`*`        | *           |
 | Cluster allocation table | content-size dependent | *           |
 | Content                  | rest of volume         | *           |
+`*` values  of around 128MB ~ 256MB are recommended
 
 ### Config area: 1 sector
 
