@@ -69,6 +69,22 @@ static void create_image(const char *device, uint8_t partition_nr, unsigned long
     fclose(f);
 }
 
+static void create_new_image(unsigned long long int new_file_mb, const char *device)
+{
+    FILE* f = fopen(device, "w");
+    if (!f) {
+        perror("fopen");
+        exit(EXIT_FAILURE);
+    }
+    if (fseek(f, new_file_mb * ONE_MB - 1, SEEK_SET) < 0) {
+        perror("fseek");
+        exit(EXIT_FAILURE);
+    }
+    char c = 0;
+    fwrite(&c, 1, 1, f);
+    fclose(f);
+}
+
 int main(int argc, char* argv[])
 {
     unsigned long long create_new   = 0;
@@ -112,19 +128,15 @@ int main(int argc, char* argv[])
         }
     }
 
-    if (optind != argc + 1) {
+    if (optind != argc - 1) {
         fprintf(stderr, "Incorrect number of arguments.\n");
         exit(EXIT_FAILURE);
     }
 
     const char* device = argv[optind];
 
-    if (create_new) {
-        if (truncate(device, create_new * 1024) < 0) {
-            perror("truncate");
-            exit(EXIT_FAILURE);
-        }
-    }
+    if (create_new)
+        create_new_image(create_new, device);
 
     create_image(device, partition_nr, metadata_mb, boot_file);
 
