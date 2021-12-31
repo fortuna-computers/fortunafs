@@ -22,7 +22,7 @@ typedef struct FFS {
 } FFS;
 
 FResult ffs_mkfs(FFS* ffs, uint8_t partition_nr,
-        uint32_t metadata_mb, uint32_t content_mb);
+        uint32_t metadata_mb, uint32_t total_size_mb);
 
 FResult ffs_init(FFS* ffs, uint8_t partition_nr);
 
