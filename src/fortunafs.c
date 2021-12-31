@@ -4,7 +4,32 @@
 
 #define TRY(__r) { if ((__r) != F_OK) return __r; }
 
-FResult ffs_mkfs(FFS* f, uint8_t partition_nr, uint32_t metadata_mb, uint32_t total_size_mb)
+// region -> Partitions
+
+static FResult partition_find_start(FFS* f, uint32_t* partition_start)
+{
+    return F_NOT_IMPLEMENTED;
+}
+
+// endregion
+
+// region -> mkfs
+
+static FResult create_filesystem(FFS *f, uint64_t content_size)
+{
+    return F_NOT_IMPLEMENTED;
+}
+
+static FResult calculate_content_size_sectors(FFS *f, uint64_t total_size_mb, uint64_t *content_size)
+{
+    return F_NOT_IMPLEMENTED;
+}
+
+// endregion
+
+// region -> Public functions
+
+FResult ffs_mkfs(FFS* f, uint8_t partition_nr, uint32_t metadata_mb, uint64_t total_size_mb)
 {
     if (!f || !f->buffer || !f->read_f || !f->write_f)
         return F_INVALID_CALL;
@@ -17,12 +42,13 @@ FResult ffs_mkfs(FFS* f, uint8_t partition_nr, uint32_t metadata_mb, uint32_t to
     f->cat_start = f->metadata_start + (metadata_mb / SECTORS_PER_MB);
     
     uint64_t content_size;
-    TRY(calculate_content_size_sectors(f, &content_size))
-    f->content_start = 
+    TRY(calculate_content_size_sectors(f, total_size_mb, &content_size))
+    f->content_start = content_size;
 
-    // TODO - create image
+    // create filesystem
+    TRY(create_filesystem(f, content_size))
 
-    return F_NOT_IMPLEMENTED;
+    return F_OK;
 }
 
 FResult ffs_init(FFS* f, uint8_t partition_nr)
@@ -49,3 +75,5 @@ FResult ffs_listkeys(FFS* f, uint64_t* index)
 {
     return F_NOT_IMPLEMENTED;
 }
+
+// endregion

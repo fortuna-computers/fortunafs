@@ -12,8 +12,9 @@ typedef enum FResult {
 
 typedef struct FFS {
     uint8_t* buffer;
-    FResult  (*read_f)(uint64_t sector, uint8_t* buffer);
-    FResult  (*write_f)(uint64_t sector, uint8_t const* buffer);
+    FResult  (*read_f)(uint64_t sector, uint8_t* buffer, void* data);
+    FResult  (*write_f)(uint64_t sector, uint8_t const* buffer, void* data);
+    void*    data;
     uint32_t partition_start;
     uint32_t hash_start;
     uint32_t metadata_start;
@@ -21,8 +22,7 @@ typedef struct FFS {
     uint32_t content_start;
 } FFS;
 
-FResult ffs_mkfs(FFS* ffs, uint8_t partition_nr,
-        uint32_t metadata_mb, uint32_t total_size_mb);
+FResult ffs_mkfs(FFS* f, uint8_t partition_nr, uint32_t metadata_mb, uint64_t total_size_mb);
 
 FResult ffs_init(FFS* ffs, uint8_t partition_nr);
 
