@@ -152,6 +152,8 @@ FResult ffs_putvalue(FFS* ffs, uint64_t key_index, uint64_t* value_index, uint16
     if (key_index == BOOT_SECTOR) {  // special case: @boot
         if (*value_index == 0)
             *value_index = BOOT_SECTOR;
+        if (bytes < 512)
+            memset(&ffs->buffer[bytes], 0, 512 - bytes);
         TRY(ffs->write_f(*value_index, ffs->buffer, ffs->data))
         ++(*value_index);
         return F_OK;
