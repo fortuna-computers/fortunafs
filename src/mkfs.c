@@ -6,8 +6,11 @@
 #include <limits.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <string.h>
 
 #define ONE_MB (1024 * 1024)
+
+#define TRY_FS(__r) { if ((__r) != F_OK) { fprintf(stderr, "Failure during fortunafs operation: 0x%X\n", __r); exit(EXIT_FAILURE); } }
 
 extern int truncate(const char *path, off_t length);
 
@@ -26,12 +29,54 @@ static void print_help(__FILE *f, const char* program)
 
 static FResult read_f(uint64_t sector, uint8_t* buffer, void* data)
 {
-    return F_NOT_IMPLEMENTED;
+    FILE* f = data;
+    if (fseek(f, sector * 512, SEEK_SET) < 0) {
+        perror("fseek");
+        exit(EXIT_FAILURE);
+    }
+    if (fread(buffer, 512, 1, f) == 0) {
+        perror("fread");
+        exit(EXIT_FAILURE);
+    }
+    return F_OK;
 }
 
 static FResult write_f(uint64_t sector, uint8_t const* buffer, void* data)
 {
-    return F_NOT_IMPLEMENTED;
+    FILE* f = data;
+    if (fseek(f, sector * 512, SEEK_SET) < 0) {
+        perror("fseek");
+        exit(EXIT_FAILURE);
+    }
+    if (fwrite(buffer, 512, 1, f) == 0) {
+        perror("fwrite");
+        exit(EXIT_FAILURE);
+    }
+    return F_OK;
+}
+
+static void add_boot_file(FFS *ffs, const char *boot_file)
+{
+    uint64_t key_index = 0,
+             value_index = 0;
+
+    FILE* f = fopen(boot_file, "rb");
+    if (!f) {
+        perror("fopen");
+        exit(EXIT_FAILURE);
+    }
+
+    strcpy((char *) ffs->buffer, "@boot");
+    fseek(f, 0, SEEK_END);
+    TRY_FS(ffs_putkey(ffs, &key_index, ftell(f)))
+    fseek(f, 0, SEEK_SET);
+
+    while (!feof(f)) {
+        unsigned long r = fread(ffs->buffer, 1, 512, f);
+        TRY_FS(ffs_putvalue(ffs, key_index, &value_index, r))
+    }
+
+    fclose(f);
 }
 
 static void create_image(const char *device, uint8_t partition_nr, unsigned long metadata_mb, const char* boot_file)
@@ -42,7 +87,7 @@ static void create_image(const char *device, uint8_t partition_nr, unsigned long
         exit(EXIT_FAILURE);
     }
 
-    FILE* f = fopen(device, "ab");
+    FILE* f = fopen(device, "r+b");
     if (!f) {
         perror("fopen");
         exit(EXIT_FAILURE);
@@ -62,9 +107,8 @@ static void create_image(const char *device, uint8_t partition_nr, unsigned long
         exit(EXIT_FAILURE);
     }
 
-    if (boot_file) {
-        // TODO - add boot file
-    }
+    if (boot_file)
+        add_boot_file(&ffs, boot_file);
 
     fclose(f);
 }
@@ -93,7 +137,7 @@ int main(int argc, char* argv[])
     const char*        boot_file    = NULL;
 
     int opt;
-    while ((opt = getopt(argc, argv, "hC:P:M:")) != -1) {
+    while ((opt = getopt(argc, argv, "hC:P:M:b:")) != -1) {
         switch (opt) {
             case 'h':
                 print_help(stdout, argv[0]);
