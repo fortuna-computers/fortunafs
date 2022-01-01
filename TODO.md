@@ -1,5 +1,5 @@
 - [X] mkfs (no partition)
-  - [ ] boot
+  - [X] write boot
 - [ ] fuse infrastructure
   - [ ] mount
   - [ ] boot
